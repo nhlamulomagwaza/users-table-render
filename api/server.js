@@ -4,7 +4,7 @@ const app = express();
 const cors = require('cors');
 const port = process.env.PORT || 3000; //Will either get the port from the .env file or will use port 3000
 const corsOptions = require('./config/corsOptions')
-
+const mimeTypes = require('mime-types');
 const routes= require('./routes/routes');
 const authenticationMiddleWare= require('./config/authenticateMiddleware');
 /* MIDDLEWARES */
@@ -15,7 +15,15 @@ app.use(express.json());
 
 app.use('/api/users', authenticationMiddleWare, routes);
 
-
+app.use(express.static(path.join(__dirname, '/client/dist'), {
+  setHeaders: (res, path) => {
+    const mimeType = mimeTypes.lookup(path);
+    console.log(`Path: ${path}, MimeType: ${mimeType}`);
+    if (mimeType) {
+      res.setHeader('Content-Type', mimeType);
+    }
+  }
+}));
 
 
 
